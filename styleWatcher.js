@@ -18,22 +18,25 @@ const excludeDir = [
 
 // 目前有stylus、less
 // from 和 target 会被替换掉
-const types = {
+const Template = {
     stylus: {
         extension: "styl",
-        cmd: "stylus <from> target"
+        cmd: "stylus <${from}> ${target}",
+        targetExtension: "css"
     },
     less: {
         extension: "less",
-        cmd: "lessc from target"
+        cmd: "lessc ${from} ${target}",
+        targetExtension: "css"
     },
     typescript: {
-        extension: "ts",
+        extension: ["ts", "tsx"],
         // cmd: "tsc --outFile file.js file.ts"
-        cmd: "tsc --outFile target from"
+        cmd: "tsc --outFile ${target} ${from}",
+        targetExtension: {ts: "js", tsx: "jsx"}
     }
 };
-const supportType = Object.keys(types);
+const supportType = Object.keys(Template);
 
 // 监听路径数组  避免重复监听
 const watchArr = [];
@@ -89,9 +92,17 @@ function addZero(time) {
 
 // 获取cmd命令
 function getCMD(filePath) {
-    const obj = types[type];
-    const target = filePath.replace(obj.extension, targetExtension);
-    return obj.cmd.replace("from", filePath).replace("target", target);
+    const tem = Template[type];
+    const filePathSplit = filePath.split(".");
+    if (filePathSplit.length < 2) {
+        throw new Error("该路径没有后缀!");
+    }
+    const lastIndex = filePathSplit.length - 1;
+    const ext = tem.extension;
+    const tgExt = tem.targetExtension;
+    filePathSplit[lastIndex] = typeof ext === "string" ? targetExtension : tgExt[filePathSplit[lastIndex]];
+    const target = filePathSplit.join(".");
+    return tem.cmd.replace("${from}", filePath).replace("${target}", target);
 }
 
 function getTime() {
@@ -154,8 +165,10 @@ function watch(fileName) {
             console.log("watch try catch", e, filePath);
         }
 
+        let ext = Template[type].extension;
+        ext = Array.isArray(ext) ? ext : [ext];
         // 判断是否需要监听的文件类型
-        if (s.length < 2 || s[s.length - 1] !== types[type].extension) return;
+        if (s.length < 2 || !ext.includes(s[s.length - 1])) return;
         console.log(getTime(), '监听到', filePath, '文件有改动');
 
         // 复制到txt文件
@@ -268,7 +281,7 @@ async function init() {
             let {watchDir: wd, type: tp, targetExtension: te} = JSON.parse(file);
             watchDir = wd || [];
             type = tp || "";
-            targetExtension = te || "";
+            targetExtension = te || Template[type].targetExtension;
 
             const existsWatchDir = await existWatchDir(watchDir);
             // 目录不存在，重新输入目录
@@ -281,6 +294,10 @@ async function init() {
                 console.log("该预编译语言类型", type, "尚未配置！请重新输入，或配置该类型！");
                 type = await inputType();
             }
+
+            if (!targetExtension) {
+                targetExtension = (await input("请输入编译后的文件类型(默认: " + JSON.stringify(Template[type].targetExtension) + "):")) || Template[type].targetExtension;
+            }
         }
 
         // 如果不存在或者不使用旧的 添加新配置
@@ -291,10 +308,10 @@ async function init() {
             // type = (await input("请输入预编译语言类型:")) || type;
             type = await inputType();
 
-            targetExtension = (await input("请输入编译后的文件类型:")) || targetExtension;
+            targetExtension = (await input("请输入编译后的文件类型(默认: " + JSON.stringify(Template[type].targetExtension) + "):")) || Template[type].targetExtension;
         }
 
-        console.log(`\n监听目录:${watchDir}, 预编译语言:${type}, 编译文件后缀:${targetExtension}\n`);
+        console.log(`\n监听目录:${watchDir}, 预编译语言:${type}, 编译文件后缀:${JSON.stringify(targetExtension)}\n`);
 
         // 遍历目录
         watchDir.forEach(w => forEachDir(w));
