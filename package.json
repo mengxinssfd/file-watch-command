@@ -1,6 +1,6 @@
 {
   "name": "@mxssfd/style-watcher",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "ts工具函数",
   "main": "./styleWatcher.js",
   "scripts": {},
