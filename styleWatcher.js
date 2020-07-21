@@ -6,6 +6,14 @@ let watchDir = ['./test'];// 监听的文件或文件夹 test | test,test2
 let type = 'less'; // css预编译语言类型
 let targetExtension = "wxss";// 目标文件后缀名
 
+// 监听路径数组  避免重复监听
+const watchArr = [];
+
+process.on('exit', function (code) {
+    console.log(code);
+});
+process.stdin.setEncoding('utf8');
+
 // 监听忽略目录
 const excludeDir = [
     "node_modules",
@@ -38,13 +46,6 @@ const Template = {
 };
 const supportType = Object.keys(Template);
 
-// 监听路径数组  避免重复监听
-const watchArr = [];
-
-process.on('exit', function (code) {
-    console.log(code);
-});
-process.stdin.setEncoding('utf8');
 
 function debounce(callback, delay) {
     let timer;
@@ -52,9 +53,10 @@ function debounce(callback, delay) {
     return function (...args) {
         if (timer) {
             clearTimeout(timer);
+            timer = null;
         }
         timer = setTimeout(() => {
-            callback(...args);
+            callback.apply(this, args);
         }, delay);
     };
 }

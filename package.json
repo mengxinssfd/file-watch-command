@@ -1,0 +1,20 @@
+{
+  "name": "@mxssfd/style-watcher",
+  "version": "1.0.0",
+  "description": "ts工具函数",
+  "main": "./styleWatcher.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mengxinssfd/styleWatcher.git"
+  },
+  "keywords": [
+    "监听编译"
+  ],
+  "author": "dyh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mengxinssfd/styleWatcher/issues"
+  },
+  "homepage": "https://github.com/mengxinssfd/styleWatcher#readme"
+}
