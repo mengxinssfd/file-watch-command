@@ -1,7 +1,7 @@
 {
   "name": "@mxssfd/style-watcher",
-  "version": "1.0.2",
-  "description": "ts工具函数",
+  "version": "1.0.3",
+  "description": "监听文件变动调用对应的编译命令",
   "main": "./styleWatcher.js",
   "scripts": {},
   "bin": {
