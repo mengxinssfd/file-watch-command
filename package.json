@@ -1,11 +1,11 @@
 {
   "name": "@mxssfd/style-watcher",
-  "version": "1.0.5",
+  "version": "1.0.11",
   "description": "监听文件变动调用对应的编译命令",
   "main": "./styleWatcher.js",
   "scripts": {},
   "bin": {
-    "watch": "./bin/watch"
+    "watch": "bin/watch"
   },
   "repository": {
     "type": "git",
