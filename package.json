@@ -4,6 +4,9 @@
   "description": "ts工具函数",
   "main": "./styleWatcher.js",
   "scripts": {},
+  "bin": {
+    "wch": "./bin/watch"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mengxinssfd/styleWatcher.git"
