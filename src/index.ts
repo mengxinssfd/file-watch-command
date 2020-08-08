@@ -1,6 +1,7 @@
 const fs = require('fs');
 const Path = require('path');
-const exec = require('child_process').exec;
+const childProcess = require('child_process');
+const exec = childProcess.exec;
 
 let watchDir = ['./test'];// 监听的文件或文件夹 test | test,test2
 let type = 'less'; // css预编译语言类型
@@ -17,11 +18,11 @@ process.stdin.setEncoding('utf8');
 // 监听忽略目录
 const excludeDir = [
     "node_modules",
-    ".idea",
-    ".git",
+    "\\.idea",
+    "\\.git",
 ].map(d => {
         return new RegExp(d);
-    }
+    },
 );
 
 // 目前有stylus、less
@@ -30,22 +31,21 @@ const Template = {
     stylus: {
         extension: "styl",
         cmd: "stylus <${from}> ${target}",
-        targetExtension: "css"
+        targetExtension: "css",
     },
     less: {
         extension: "less",
         cmd: "lessc ${from} ${target}",
-        targetExtension: "css"
+        targetExtension: "css",
     },
     typescript: {
         extension: ["ts", "tsx"],
         // cmd: "tsc --outFile file.js file.ts"
         cmd: "tsc --outFile ${target} ${from}",
-        targetExtension: {ts: "js", tsx: "jsx"}
-    }
+        targetExtension: {ts: "js", tsx: "jsx"},
+    },
 };
 const supportType = Object.keys(Template);
-
 
 function debounce(callback, delay) {
     let timer;
@@ -62,12 +62,11 @@ function debounce(callback, delay) {
 }
 
 // 控制台输入
-function input(tips) {
+function input(tips): Promise<string> {
     process.stdout.write(tips);
-    return new Promise((res, rej) => {
-        process.stdin.on('data', (input) => {
-            input = input.toString().trim();
-            res(input);
+    return new Promise((res) => {
+        process.stdin.on('data', (input: Buffer) => {
+            res(input.toString().trim());
             // if ([ 'NO', 'no'].indexOf(input) > -1) process.exit(0);
         });
     });
@@ -116,10 +115,13 @@ function getTime() {
 }
 
 // 执行命令
-async function execute(filePath) {
+async function execute(filePath: string) {
     const cmd = getCMD(filePath);
     console.log(getTime(), '执行"' + cmd + '"命令...');
-    exec(cmd, function (error, stdout, stderr) {
+    exec(cmd, function (error: Error | null, stdout: string/*, stderr: string*/) {
+        console.log('\n\n*************************命令输出start*************************');
+        console.log(stdout);
+        console.log('*************************命令输出end*******************\n\n');
         if (error) {
             console.log('编译失败');
             console.log('\n\n*******************************************');
@@ -161,7 +163,7 @@ function watch(fileName) {
             // 如果是新增的目录，必须添加监听否则不能监听到该目录的文件变化
             const stat = await fs.statSync(filePath);
             if (stat.isDirectory()) {
-                watch(filePath);
+                forEachDir(filePath);
             }
         } catch (e) {
             console.log("watch try catch", e, filePath);
