@@ -1,6 +1,6 @@
 {
   "name": "@mxssfd/file-watch-command",
-  "version": "1.0.12",
+  "version": "2.0.0",
   "description": "监听文件变动调用对应的编译命令",
   "main": "src/index.js",
   "scripts": {},
