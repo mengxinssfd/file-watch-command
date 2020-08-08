@@ -11,4 +11,4 @@ file-watch
 
 步骤3：填写监听文件夹，预编译类型，编译目标类型即可
 ## 流程图
-![Image text](https://github.com/mengxinssfd/file-watch-command//blob/master/mind.png)
+![Image text](https://github.com/mengxinssfd/file-watch-command/blob/master/mind.png)
