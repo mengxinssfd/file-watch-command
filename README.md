@@ -10,6 +10,6 @@
 npm i @mxssfd/file-watch-command
 ```
 ```
-watch
+file-watch
 ```
 步骤3：填写监听文件夹，预编译类型，编译目标类型即可
