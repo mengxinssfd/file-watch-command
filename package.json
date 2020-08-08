@@ -1,15 +1,15 @@
 {
-  "name": "@mxssfd/style-watcher",
-  "version": "1.0.11",
+  "name": "@mxssfd/file-watch-command",
+  "version": "1.0.12",
   "description": "监听文件变动调用对应的编译命令",
   "main": "./styleWatcher.js",
   "scripts": {},
   "bin": {
-    "watch": "bin/watch"
+    "file-watch": "bin/watch"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mengxinssfd/styleWatcher.git"
+    "url": "git+https://github.com/mengxinssfd/file-watch-command.git"
   },
   "keywords": [
     "监听编译"
@@ -17,7 +17,7 @@
   "author": "dyh",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/mengxinssfd/styleWatcher/issues"
+    "url": "https://github.com/mengxinssfd/file-watch-command/issues"
   },
-  "homepage": "https://github.com/mengxinssfd/styleWatcher#readme"
+  "homepage": "https://github.com/mengxinssfd/file-watch-command#readme"
 }
