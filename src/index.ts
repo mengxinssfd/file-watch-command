@@ -1,5 +1,6 @@
 // tsc --target ES5 --experimentalDecorators
 
+// TODO Template存配置文件且可编辑
 const fs = require('fs');
 const Path = require('path');
 const childProcess = require('child_process');
@@ -10,26 +11,27 @@ const exec = childProcess.exec;
 const Template = {
     stylus: {
         extension: "styl",
-        cmd: "stylus <${from}> ${target}",
-        targetExtension: "css",
+        cmd: "stylus <${from}> ${to}",
+        toExtension: "css",
     },
     less: {
         extension: "less",
-        cmd: "lessc ${from} ${target}",
-        targetExtension: "css",
+        cmd: "lessc ${from} ${to}",
+        toExtension: "css",
     },
     typescript: {
+        // ts => js  tsx => jsx
         extension: ["ts", "tsx"],
         // cmd: "tsc --outFile file.js file.ts"
-        cmd: "tsc --outFile ${target} ${from}",
-        targetExtension: {ts: "js", tsx: "jsx"},
+        cmd: "tsc --outFile ${to} ${from}",
+        toExtension: {ts: "js", tsx: "jsx"},
     },
 };
 type TEMPLATE = typeof Template
 
 let watchDir = ['./test'];// 监听的文件或文件夹 test | test,test2
 let type: keyof TEMPLATE = 'less'; // css预编译语言类型
-let targetExtension: string = "wxss";// 目标文件后缀名
+let toExtension: string = "wxss";// 目标文件后缀名
 
 // 监听路径数组  避免重复监听
 const watchArr = [];
@@ -126,10 +128,10 @@ function getCMD(filePath: string): string {
     }
     const lastIndex = filePathSplit.length - 1;
     const ext = tem.extension;
-    const tgExt = tem.targetExtension;
-    filePathSplit[lastIndex] = typeof ext === "string" ? targetExtension : tgExt[filePathSplit[lastIndex]];
+    const tgExt = tem.toExtension;
+    filePathSplit[lastIndex] = typeof ext === "string" ? toExtension : tgExt[filePathSplit[lastIndex]];
     const target = filePathSplit.join(".");
-    return tem.cmd.replace("${from}", filePath).replace("${target}", target);
+    return tem.cmd.replace("${from}", filePath).replace("${to}", target);
 }
 
 function getTime(): string {
@@ -164,10 +166,10 @@ class Watcher {
             // 使用旧的配置  并校验配置文件
             if (existsConfigFile && isUseOld === "Y") {
                 const file = await fs.readFileSync(configFilePath);
-                let {watchDir: wd, type: tp, targetExtension: te} = JSON.parse(file);
+                let {watchDir: wd, type: tp, toExtension: te} = JSON.parse(file);
                 watchDir = wd || [];
                 type = tp || "";
-                targetExtension = te || Template[type].targetExtension;
+                toExtension = te || Template[type].toExtension;
 
                 const existsWatchDir = await this.existWatchDir(watchDir);
                 // 目录不存在，重新输入目录
@@ -183,8 +185,8 @@ class Watcher {
 
                 // 判断是否有文件后缀名
                 const extension: string = this.getDefaultTargetExtension(type);
-                if (!targetExtension) {
-                    targetExtension = (await input("请输入编译后的文件类型(默认: " + extension + "):")) || extension;
+                if (!toExtension) {
+                    toExtension = (await input("请输入编译后的文件类型(默认: " + extension + "):")) || extension;
                 }
             }
 
@@ -197,16 +199,16 @@ class Watcher {
                 type = await this.inputType();
 
                 const extension: string = this.getDefaultTargetExtension(type);
-                targetExtension = (await input("请输入编译后的文件类型(默认: " + extension + "):")) || extension;
+                toExtension = (await input("请输入编译后的文件类型(默认: " + extension + "):")) || extension;
             }
 
-            console.log(`\n监听目录:${watchDir}, 预编译语言:${type}, 编译文件后缀:${JSON.stringify(targetExtension)}\n`);
+            console.log(`\n监听目录:${watchDir}, 预编译语言:${type}, 编译文件后缀:${JSON.stringify(toExtension)}\n`);
 
             // 遍历目录
             watchDir.forEach(w => this.forEachDir(w));
 
             // 保存设置
-            await fs.writeFileSync(configFilePath, JSON.stringify({watchDir, type, targetExtension}));
+            await fs.writeFileSync(configFilePath, JSON.stringify({watchDir, type, toExtension}));
         } catch (e) {
             console.error("init try catch", e);
         }
@@ -214,7 +216,7 @@ class Watcher {
     }
 
     getDefaultTargetExtension(type: keyof typeof Template): string {
-        const extension = Template[type].targetExtension;
+        const extension = Template[type].toExtension;
         return typeof extension === "string" ? extension : JSON.stringify(extension);
     }
 
